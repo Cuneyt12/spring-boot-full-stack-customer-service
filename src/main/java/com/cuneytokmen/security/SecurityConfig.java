@@ -17,6 +17,9 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -32,6 +35,8 @@ public class SecurityConfig {
 
     @Autowired
     ILoginRepository iLoginRepository;
+
+    List<UserDetails> users;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,16 +55,26 @@ public class SecurityConfig {
     }
     @Bean
     public UserDetailsService userDetailsService() {
-        LoginInformation loginInformation = iLoginRepository.findAll().get(0);
-        String username = loginInformation.getUsername() != null ? loginInformation.getUsername() : "";
-        String password = loginInformation.getPassword() != null ? loginInformation.getPassword() : "";
+        List<LoginInformation> loginInformation = iLoginRepository.findAll();
+        UserDetails user = null;
+        users = getUsersInstace();
 
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username(username)
-                .password(password)
-                .roles("CUSTOMER")
-                .build();
+        for (LoginInformation login : loginInformation){
+            user = User.withDefaultPasswordEncoder()
+                    .username(login.getUsername())
+                    .password(login.getPassword())
+                    .roles("CUSTOMER")
+                    .build();
+            users.add(user);
+        }
 
-        return new InMemoryUserDetailsManager(user);
+        return new InMemoryUserDetailsManager(users);
+    }
+
+    private List<UserDetails> getUsersInstace() {
+        if (users == null)
+            users = new ArrayList<>();
+        users.clear();
+        return users;
     }
 }
