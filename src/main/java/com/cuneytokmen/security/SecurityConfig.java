@@ -57,7 +57,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         List<LoginInformation> loginInformation = iLoginRepository.findAll();
         UserDetails user = null;
-        users = getUsersInstace();
+        users = getUsersInstance();
 
         for (LoginInformation login : loginInformation){
             user = User.withDefaultPasswordEncoder()
@@ -71,7 +71,7 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(users);
     }
 
-    private List<UserDetails> getUsersInstace() {
+    private List<UserDetails> getUsersInstance() {
         if (users == null)
             users = new ArrayList<>();
         users.clear();
